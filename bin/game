@@ -14,7 +14,8 @@ function printWelcomeMessage() {
 }
 
 function playRound(userMove) {
-  if (userMove.trim() === 'quit') {
+  userMove = userMove.trim() 
+  if (userMove === 'quit') {
     done()
   }
   const aiMove = logic.computerMove()
