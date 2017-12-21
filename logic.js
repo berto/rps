@@ -30,7 +30,12 @@ function convertAiMove(aiMove) {
   }
 }
 
+function validateUserInput(input) {
+  return input === 'rock' || input === 'scissor' || input === 'paper'
+}
+
 module.exports = {
   computerMove,
-  calculateWinner
+  calculateWinner,
+  validateUserInput
 }

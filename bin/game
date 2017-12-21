@@ -18,10 +18,15 @@ function playRound(userMove) {
   if (userMove === 'quit') {
     done()
   }
-  const aiMove = logic.computerMove()
-  const result = logic.calculateWinner(userMove, aiMove)
-  printMoves(userMove, aiMove, result)
-  console.log('Play again: \n')
+  const isValid = logic.validateUserInput(userMove)
+  if (!isValid) {
+    console.log('Invalid input, try again')
+  } else  {
+    const aiMove = logic.computerMove()
+    const result = logic.calculateWinner(userMove, aiMove)
+    printMoves(userMove, aiMove, result)
+    console.log('Play again: \n')
+  }
 }
 
 function printMoves(user, ai, result) {
@@ -31,7 +36,7 @@ function printMoves(user, ai, result) {
   console.log('Winner: ' + result + '\n')
 }
 
-function done() {
+function done(message) {
   console.log('Thanks for playing!')
   process.exit()
 }
