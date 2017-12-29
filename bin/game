@@ -1,42 +1,86 @@
 #!/usr/bin/env node
+require('colors')
 const logic = require('../logic')
+
+const exitCommand = 'quit'
+const totalRounds = 5
+const startingMessage = `Rock, Paper, Scissors!
+First one to ${totalRounds} wins
+Enter your choice (or ${exitCommand} to exit):
+`
+let score = {
+  computer: 0,
+  player: 0
+} 
 
 process.stdin.resume()
 process.stdin.setEncoding('utf8')
 
-printWelcomeMessage()
+printWelcomeMessage(startingMessage)
 
 process.stdin.on('data', playRound)
 
-function printWelcomeMessage() {
-  console.log('Rock, Paper, Scissors, Shoot!')
-  console.log('Enter your choice (or quit to exit):')
+function printWelcomeMessage(message) {
+  console.log(message.cyan)
+  printPossibleMoves()
 }
 
 function playRound(userMove) {
   userMove = userMove.trim() 
-  if (userMove === 'quit') {
-    done()
+  if (userMove === exitCommand) {
+    const exitMessage = 'Thanks for playing!'
+    done(exitMessage)
   }
   const isValid = logic.validateUserInput(userMove)
   if (!isValid) {
-    console.log('Invalid input, try again')
+    const errorMessage = 'Invalid input, try again\n'
+    console.log(errorMessage.red)
+    printPossibleMoves()
   } else  {
-    const aiMove = logic.computerMove()
-    const result = logic.calculateWinner(userMove, aiMove)
-    printMoves(userMove, aiMove, result)
-    console.log('Play again: \n')
+    const computerMove = logic.generateComputerMove()
+    const result = logic.calculateWinner(userMove, computerMove)
+    const emojiUserMove = logic.emojifyMove(userMove)
+    const emojiComputerMove = logic.emojifyMove(computerMove)
+    score = logic.calculateScore(result, score)
+    printResult(emojiUserMove, emojiComputerMove, result)
+    nextRound()
   }
 }
 
-function printMoves(user, ai, result) {
-  console.log('\n')
-  console.log('Your move: ' + user)
-  console.log('Computer move: ' + ai + '\n')
-  console.log('Winner: ' + result + '\n')
+function printResult(user, ai, result) {
+  const resultMessage = `
+Your move: ${user}
+Computer move: ${ai}
+Winner: ${result}
+
+Computer: ${score.computer}
+You: ${score.player}
+`
+  console.log(resultMessage.magenta)
+}
+
+function printPossibleMoves() {
+  const message = logic.possibleMoves.reduce((message, move, i, moves) => {
+    message += i === moves.length - 1 ? `or ${move}` : `${move}, `
+    return message
+  }, 'Type ') 
+  console.log(message.yellow)
+}
+
+function nextRound() {
+  let message = 'Game Over\n'
+  if (score.computer >= totalRounds) {
+    message += 'Computer Won! Thanks for Playing!'.rainbow
+    done(message)
+  } else if (score.player >= totalRounds) {
+    message += 'You Won! Thanks for Playing!'.rainbow
+    done(message)
+  } else {
+    console.log('Go again: \n'.yellow)
+  }
 }
 
 function done(message) {
-  console.log('Thanks for playing!')
+  console.log(message.cyan)
   process.exit()
 }
